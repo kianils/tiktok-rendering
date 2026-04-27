@@ -249,6 +249,40 @@ Preprocessed dataset saved to `sessions_preprocessed.csv` (7,301 rows × 15 colu
 
 ---
 
+## Hyperparameter Tuning
+
+Full pipeline in `tuning.ipynb` / `tuning_executed.ipynb`. All tuning uses `GridSearchCV` with a 3-fold inner CV nested inside 5-fold outer CV. F1 is the selection criterion throughout (preferred over accuracy given 85/15 class imbalance).
+
+### Tuning Grids and Winners
+
+| Model | Parameter(s) | Grid | Best value | Inner CV F1 |
+|---|---|---|---|---|
+| Logistic Regression | `C` | [0.001, 0.01, 0.1, 0.5, 1, 10, 100] | **0.001** | 0.8828 |
+| Random Forest | `max_depth`, `min_samples_leaf` | [5, 15, None] × [1, 5, 20] | **depth=5, leaf=20** | 0.8870 |
+| AdaBoost | `n_estimators`, `learning_rate` | [100, 200, 400] × [0.1, 0.5, 1.0] | **n=400, lr=1.0** | 0.8897 |
+
+### Interpretation of Best Parameters
+
+**Logistic Regression `C=0.001`:** Strong regularisation is preferred, meaning the model benefits from being pulled toward small coefficients. This is consistent with features like `event_count` being heavily right-skewed — without regularisation, the coefficient for this feature would dominate the decision boundary.
+
+**Random Forest `max_depth=5, min_samples_leaf=20`:** Shallow trees with large leaves win over fully-grown trees. The dataset has 7,301 sessions with 14 features — deep trees can memorise individual binge-day sessions, so aggressive pruning via `min_samples_leaf=20` is the right call.
+
+**AdaBoost `n_estimators=400, learning_rate=1.0`:** More stumps at full step size. Because each stump is a max-depth-1 tree (very weak), 400 rounds don't overfit and the full learning rate makes each round maximally informative.
+
+### Nested CV Results (tuned models)
+
+Outer 5-fold CV with inner GridSearch on each fold — no data leakage:
+
+| Model | Accuracy | F1 | Precision | Recall | AUC |
+|---|---|---|---|---|---|
+| LR (tuned) | ~0.965 | ~0.882 | ~0.934 | ~0.837 | ~0.943 |
+| RF (tuned) | ~0.967 | ~0.882 | ~0.964 | ~0.814 | ~0.938 |
+| Ada (tuned) | ~0.968 | ~0.887 | ~0.972 | ~0.816 | ~0.945 |
+
+Tuning produced marginal gains (~0.001–0.005 F1) over default params, confirming the defaults were already well-chosen. The validation curve for LR (`plot_tuning_lr.png`) shows train F1 diverging from val F1 at large C — classic overfitting. The RF heatmap (`plot_tuning_rf.png`) shows that both deep unlimited trees and very small leaf sizes hurt val F1.
+
+---
+
 ### Formatting note for submission
 
 - Convert this draft to **double-spaced** pages in Word/Google Docs using your department’s preferred font and margins; expand transitions where your instructor expects more scene-setting or case detail.
