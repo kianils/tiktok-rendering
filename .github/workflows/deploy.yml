@@ -1,0 +1,82 @@
+name: Deploy to GitHub Pages
+
+# Builds the static Next.js export and publishes it to GitHub Pages on
+# every push to main. Uses the official GitHub Pages deployment actions
+# (no third-party push-to-branch scripts).
+#
+# Before this workflow runs successfully, enable Pages in repo settings:
+#   Settings → Pages → Build and deployment → Source: "GitHub Actions".
+# That switch is done once, in the UI; the workflow handles the rest.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Minimum permissions needed to deploy a GitHub Pages site.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Prevent overlapping deployments — a second push cancels the first.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        # v5 runs on Node 24 (v4 was deprecated for Node 20 runtime).
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # Use an active LTS so the Pages runtime matches Next.js 16's
+          # minimum and avoids the Node-20 deprecation warning.
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (static export)
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Disable Jekyll processing
+        # GitHub Pages runs Jekyll by default, which strips directories
+        # beginning with an underscore (Next.js's _next/ is one). A
+        # single .nojekyll file at the root disables that behaviour.
+        run: touch out/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          # When Pages has never been configured for the repo, let the
+          # action enable it automatically (permitted because this job
+          # already has `pages: write`). Still: on first deploy you may
+          # need to toggle Source = "GitHub Actions" in repo Settings →
+          # Pages manually; `enablement` covers some but not all repo
+          # states.
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
