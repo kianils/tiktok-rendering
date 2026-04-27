@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+/* Class-based dark variant so `<div class="dark">` (and descendants)
+   activate every `dark:` utility below. Media-query dark mode remains
+   the default for the landing state; the dashboard opts in explicitly. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Forced-dark wrapper — when the dashboard view is active, paint the
+   full viewport dark regardless of system preference. */
+.dark {
+  color-scheme: dark;
+  --background: #09090b;
+  --foreground: #fafafa;
+}
+
+/* --- Motion primitives used across the dashboard --- */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin-smooth {
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 420ms ease both;
+}
+
+.animate-spin-smooth {
+  animation: spin-smooth 900ms linear infinite;
+}
+
+/* Respect reduced-motion preference — drop the transform, keep the
+   opacity tween so the sections still resolve to their final state. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in {
+    animation: fade-in 1ms linear both;
+  }
+  .animate-spin-smooth {
+    animation-duration: 2s;
+  }
+}
