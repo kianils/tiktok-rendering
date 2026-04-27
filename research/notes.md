@@ -103,6 +103,84 @@ Zuboff, Shoshana. *The Age of Surveillance Capitalism: The Fight for a Human Fut
 
 ---
 
+---
+
+## Data Description
+
+### Source
+
+Personal TikTok data export (`user_data_tiktok.json`, 18.5 MB) requested via **Profile → Settings and privacy → Account → Download your data** and downloaded as a ZIP archive. The export covers account activity from **2019-01-13 to 2026-04-22** (~7.3 years).
+
+### Unit of Observation
+
+One row = **one session**. A session is a contiguous block of user activity events separated from adjacent events by gaps of fewer than 30 minutes (the standard inactivity threshold used across the analysis codebase). Sessions are derived from raw events; they are not a native export concept.
+
+### Raw Events (before sessionization)
+
+| Event type | Count | Primitive class |
+|---|---|---|
+| Watch (video view) | 60,541 | `attention` |
+| Favorite video | 9,076 | `preference` |
+| Comment | 6,995 | `social` |
+| Repost | 3,120 | `social` |
+| Favorite sound | 2,436 | `preference` |
+| Share | 1,865 | `social` |
+| Search | 1,461 | `intent` |
+| **Total** | **85,494** | — |
+
+### Dataset Size (session-level)
+
+| | Value |
+|---|---|
+| Total sessions (rows) | 7,301 |
+| Input features | 12 |
+| Binge sessions (label = 1) | 1,121 (15.4%) |
+| Normal sessions (label = 0) | 6,180 (84.6%) |
+
+### Label Definition
+
+`binge = 1` if the session falls on a calendar day whose total event count is (a) in the user's personal top 10th percentile of daily volumes **and** (b) at least 2× the user's median daily event count. Both conditions must hold; this anchors the label to the individual's own baseline rather than a population norm. Threshold: ≥ 36 events/day (90th percentile = 36, median = 9).
+
+### Feature Descriptions and Summary Statistics
+
+| Feature | Type | Description | Mean | Std | Min | Max |
+|---|---|---|---|---|---|---|
+| `event_count` | int | Total events in session | 11.71 | 43.66 | 1 | 1,226 |
+| `duration_min` | float | Session span in minutes | 14.21 | 22.36 | 0.0 | 332.0 |
+| `peak_epm` | float | Events per minute (n / max(duration, 1)) | 1.13 | 1.47 | 0.06 | 19.4 |
+| `watch_share` | float | Fraction of events that are video watches | 0.116 | 0.310 | 0.0 | 1.0 |
+| `search_share` | float | Fraction of events that are searches | 0.003 | 0.016 | 0.0 | 0.4 |
+| `social_share` | float | Fraction of events that are social (comment/repost/share) | 0.389 | 0.401 | 0.0 | 1.0 |
+| `pref_share` | float | Fraction of events that are preference (like/favorite) | 0.492 | 0.419 | 0.0 | 1.0 |
+| `cascade_count` | int | Search → watch transitions within session | 0.196 | 1.282 | 0 | 38 |
+| `hour_of_day` | int | Hour of session start (0–23) | 11.7 | 8.1 | 0 | 23 |
+| `day_of_week` | int | Day of session start (0=Mon, 6=Sun) | 3.0 | 2.0 | 0 | 6 |
+| `has_search` | int (binary) | 1 if session contains ≥1 search event | 0.055 | 0.228 | 0 | 1 |
+| `has_social` | int (binary) | 1 if session contains ≥1 social event | 0.624 | 0.484 | 0 | 1 |
+
+All features are numeric (8 float64, 4 int64). No missing values (all events have timestamps by construction of the parser).
+
+### Train / Test Split Sizes (5-Fold Stratified CV)
+
+| Fold | Train | Test |
+|---|---|---|
+| 1 | 5,840 | 1,461 |
+| 2 | 5,841 | 1,460 |
+| 3 | 5,841 | 1,460 |
+| 4 | 5,841 | 1,460 |
+| 5 | 5,841 | 1,460 |
+
+Stratification preserves the 15.4% binge rate in each fold.
+
+### Limitations
+
+- **Export completeness:** TikTok returns only the data it discloses under applicable regulations. Watch history is capped at 60,541 entries (likely a platform-side truncation); internal ranking signals, server-side inferences, and A/B experiment assignments are not included.
+- **Single user:** The dataset represents one account's activity. All thresholds (top-10%, 2× median) are person-relative; results should not be generalized to a population without replication across multiple exports.
+- **No watch-duration signal:** The export records that a video was opened but not how long it was watched. The `attention` primitive is binary (opened vs. not), which underrepresents passive scrolling depth.
+- **Timestamp coarseness:** All timestamps are second-precision UTC. Session boundaries at exactly 30 minutes are a modeling choice, not a ground truth behavioral segmentation.
+
+---
+
 ### Formatting note for submission
 
 - Convert this draft to **double-spaced** pages in Word/Google Docs using your department’s preferred font and margins; expand transitions where your instructor expects more scene-setting or case detail.
