@@ -181,6 +181,74 @@ Stratification preserves the 15.4% binge rate in each fold.
 
 ---
 
+## Data Preprocessing
+
+Full pipeline is in `preprocessing.ipynb` / `preprocessing_executed.ipynb`. Each decision is documented below.
+
+### Missing-Value Handling
+
+Zero null values exist in any column. This is by construction: every session row derives from at least one timestamped event, so temporal features (`hour_of_day`, `day_of_week`) are always defined; share features are fractions over a known denominator; and `peak_epm` is floored at 1 minute to prevent division-by-zero.
+
+High zero-rates on several features reflect **genuine sparsity**, not missing data:
+
+| Feature | Zero rate | Interpretation |
+|---|---|---|
+| `search_share` | 97% | Most sessions contain no searches |
+| `cascade_count` | 88% | Search→watch chaining is rare |
+| `watch_share` | 72% | Many sessions are likes/favorites only |
+
+These zeros carry signal (distinguishing passive preference sessions from active watch sessions) and are retained as-is.
+
+### Categorical Encoding
+
+Two integer features are cyclically encoded because time is circular — treating hour 23 and hour 0 as maximally distant (as raw integers do) is incorrect.
+
+**Method: cyclical encoding** via sine/cosine projection.
+
+| Original feature | Encoding | Output columns | Rationale |
+|---|---|---|---|
+| `hour_of_day` (0–23) | `sin(x × 2π/24)`, `cos(x × 2π/24)` | `hour_sin`, `hour_cos` | Preserves adjacency of 23→0 |
+| `day_of_week` (0–6) | `sin(x × 2π/7)`, `cos(x × 2π/7)` | `dow_sin`, `dow_cos` | Preserves adjacency of Sun→Mon |
+
+Cyclical encoding was preferred over one-hot because it produces 2 columns per feature instead of 24 or 7, avoids the curse of dimensionality, and encodes the correct geometric relationship between time values.
+
+Binary features (`has_search`, `has_social`) required no encoding — they are already 0/1.
+
+### Numeric Scaling
+
+**Method: StandardScaler** (zero mean, unit variance) applied to the 8 continuous features.
+
+MinMaxScaler was rejected because `event_count` is heavily right-skewed (max=1,226, 75th pct=5) — MinMaxScaler would compress 99% of values into the bottom 0.4% of the [0,1] range, effectively zeroing them out for Logistic Regression.
+
+Features excluded from scaling: `has_search`, `has_social` (binary), `hour_sin`, `hour_cos`, `dow_sin`, `dow_cos` (already in [−1, 1]). Tree-based models (Random Forest, GBT) are scale-invariant; scaling is required only for Logistic Regression, but applying it uniformly simplifies the pipeline.
+
+The scaler is fit on **training folds only** inside each CV iteration in `ml_pipeline.py` to prevent data leakage.
+
+### Correlation Findings
+
+From the Pearson correlation heatmap (`plot_correlation_heatmap.png`):
+
+- No feature pair has |r| > 0.80 — no multicollinearity requiring feature removal.
+- Strongest positive correlations with the binge label: `event_count`, `peak_epm`, `duration_min` (sessions on binge days are longer and denser).
+- `watch_share` has a moderate positive correlation, consistent with binge days being watch-heavy.
+- Temporal features (`hour_sin/cos`, `dow_sin/cos`) show near-zero correlation with the target individually, but may contribute to tree-based models through interactions.
+
+### Final Feature Matrix
+
+14 features after preprocessing (12 original → drop 2, add 4 cyclical):
+
+```
+Continuous (StandardScaled):  event_count, duration_min, peak_epm,
+                               watch_share, search_share, social_share,
+                               pref_share, cascade_count
+Passthrough (no scaling):     has_search, has_social,
+                               hour_sin, hour_cos, dow_sin, dow_cos
+```
+
+Preprocessed dataset saved to `sessions_preprocessed.csv` (7,301 rows × 15 columns including label).
+
+---
+
 ### Formatting note for submission
 
 - Convert this draft to **double-spaced** pages in Word/Google Docs using your department’s preferred font and margins; expand transitions where your instructor expects more scene-setting or case detail.
