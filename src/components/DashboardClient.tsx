@@ -710,10 +710,10 @@ export function DashboardClient() {
               className="animate-fade-in-up max-w-xl text-balance text-base leading-relaxed text-zinc-400 sm:text-lg"
               style={{ animationDelay: "320ms" }}
             >
-              Drop in your TikTok data export. On <em>your own</em> archive, we show
-              what the platform extracted from you, how accurately a learning system
-              can predict your next move, and how that prediction closes into a loop
-              around your behaviour.
+              Upload your TikTok export. It parses in the browser and walks
+              through three things on <em>your own</em> data — what TikTok
+              actually logs, how easy it is to guess your next tap from that
+              log, and where that guessing loops back into what you watch.
             </p>
 
             <label
@@ -792,51 +792,49 @@ export function DashboardClient() {
               </summary>
               <div className="border-t border-zinc-800 px-4 py-4 text-sm leading-relaxed text-zinc-300">
                 <p>
-                  This tool is a browser-only reading of your TikTok data export,
-                  built around three ideas from Shoshana Zuboff&apos;s{" "}
+                  The whole thing runs in the browser. It&apos;s organised
+                  around three ideas from Shoshana Zuboff&apos;s{" "}
                   <em>The Age of Surveillance Capitalism</em>:
                 </p>
                 <ul className="mt-3 space-y-2 pl-4">
                   <li className="relative pl-4">
                     <span className="absolute left-0 top-[0.5em] h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    <span className="font-medium text-zinc-100">Rendering</span>,
-                    every lived gesture (a scroll, a tap, a search) is translated
-                    into machine-readable rows. Step 1 takes one of those moments
-                    apart and shows what survived as data.
+                    <span className="font-medium text-zinc-100">Rendering</span>
+                    {" "}— every scroll, tap, and search ends up as a row in
+                    a database. Step 1 pulls one of those rows apart so you
+                    can see what TikTok actually wrote down about it.
                   </li>
                   <li className="relative pl-4">
                     <span className="absolute left-0 top-[0.5em] h-1.5 w-1.5 rounded-full bg-amber-500" />
                     <span className="font-medium text-zinc-100">
                       Behavioural surplus
                     </span>
-                    , much of what&apos;s captured goes beyond what the immediate
-                    service strictly requires, and that excess is what fuels
-                    prediction products. Step 2 measures how compressible your
-                    trace is, how accurately a first-order Markov chain trained
-                    on your past predicts your future.
+                    {" "}— most of what gets logged isn&apos;t needed to serve
+                    you the next video. The leftover is what feeds prediction.
+                    Step 2 fits a Markov chain on your history and reports how
+                    often it picks your next action correctly.
                   </li>
                   <li className="relative pl-4">
                     <span className="absolute left-0 top-[0.5em] h-1.5 w-1.5 rounded-full bg-rose-500" />
                     <span className="font-medium text-zinc-100">
                       The feedback loop
                     </span>
-                    , rendering isn&apos;t one-way. The predictions a system
-                    makes about you are used to select what you see next, which
-                    shapes your next event, which becomes new training data.
-                    Step 3 names the forms that loop takes in your archive.
+                    {" "}— a guess about you decides which video plays next,
+                    that video shapes what you do, and what you do becomes the
+                    next round of training data. Step 3 finds the places in
+                    your archive where that cycle is visible.
                   </li>
                 </ul>
                 <p className="mt-3 text-xs text-zinc-500">
-                  Everything runs in your browser. Your archive is never
-                  transmitted. All statistical methods (Markov chain + Laplace
-                  smoothing, Wilson confidence intervals, bootstrap, lexicon
-                  sentiment) are deterministic and versioned; nothing is a
-                  black box.
+                  The export never leaves your machine. Every method here
+                  (Markov + Laplace smoothing, Wilson intervals, bootstrap,
+                  lexicon sentiment) is deterministic and pinned to a version,
+                  so the numbers are reproducible.
                 </p>
                 <p className="mt-2 text-xs text-zinc-500">
-                  This tool does <em>not</em> recover TikTok&apos;s actual
-                  policy, reward function, or ranking formula. It shows the
-                  structural form any such system would find in your trace.
+                  This isn&apos;t TikTok&apos;s actual ranker — that&apos;s
+                  proprietary. It&apos;s the shape of pattern any predictor
+                  trained on a trace like yours would learn.
                 </p>
               </div>
             </details>
