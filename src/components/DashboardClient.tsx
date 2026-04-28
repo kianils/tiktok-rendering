@@ -711,7 +711,7 @@ export function DashboardClient() {
               style={{ animationDelay: "320ms" }}
             >
               Upload your TikTok export. It parses in the browser and walks
-              through three things on <em>your own</em> data — what TikTok
+              through three things on <em>your own</em> data: what TikTok
               actually logs, how easy it is to guess your next tap from that
               log, and where that guessing loops back into what you watch.
             </p>
@@ -797,29 +797,26 @@ export function DashboardClient() {
                   <em>The Age of Surveillance Capitalism</em>:
                 </p>
                 <ul className="mt-3 space-y-2 pl-4">
-                  <li className="relative pl-4">
-                    <span className="absolute left-0 top-[0.5em] h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <li>
                     <span className="font-medium text-zinc-100">Rendering</span>
-                    {" "}— every scroll, tap, and search ends up as a row in
+                    : every scroll, tap, and search ends up as a row in
                     a database. Step 1 pulls one of those rows apart so you
                     can see what TikTok actually wrote down about it.
                   </li>
-                  <li className="relative pl-4">
-                    <span className="absolute left-0 top-[0.5em] h-1.5 w-1.5 rounded-full bg-amber-500" />
+                  <li>
                     <span className="font-medium text-zinc-100">
                       Behavioural surplus
                     </span>
-                    {" "}— most of what gets logged isn&apos;t needed to serve
+                    : most of what gets logged isn&apos;t needed to serve
                     you the next video. The leftover is what feeds prediction.
                     Step 2 fits a Markov chain on your history and reports how
                     often it picks your next action correctly.
                   </li>
-                  <li className="relative pl-4">
-                    <span className="absolute left-0 top-[0.5em] h-1.5 w-1.5 rounded-full bg-rose-500" />
+                  <li>
                     <span className="font-medium text-zinc-100">
                       The feedback loop
                     </span>
-                    {" "}— a guess about you decides which video plays next,
+                    : a guess about you decides which video plays next,
                     that video shapes what you do, and what you do becomes the
                     next round of training data. Step 3 finds the places in
                     your archive where that cycle is visible.
@@ -832,7 +829,7 @@ export function DashboardClient() {
                   so the numbers are reproducible.
                 </p>
                 <p className="mt-2 text-xs text-zinc-500">
-                  This isn&apos;t TikTok&apos;s actual ranker — that&apos;s
+                  This isn&apos;t TikTok&apos;s actual ranker. That&apos;s
                   proprietary. It&apos;s the shape of pattern any predictor
                   trained on a trace like yours would learn.
                 </p>

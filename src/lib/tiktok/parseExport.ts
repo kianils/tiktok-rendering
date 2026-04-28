@@ -278,7 +278,7 @@ export async function parseTikTokExportZip(file: File): Promise<ParsedArchive> {
 
   if (!merged.length) {
     warnings.push(
-      "No events were extracted. TikTok exports differ by region/version—try JSON format, ensure the ZIP is complete, and check that referenced TXT/JSON paths exist inside the archive.",
+      "No events were extracted. TikTok exports differ by region/version; try JSON format, ensure the ZIP is complete, and check that referenced TXT/JSON paths exist inside the archive.",
     );
   }
 
