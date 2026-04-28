@@ -51,3 +51,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .claude/
+
+# agent instruction files (kept locally, not in repo)
+AGENTS.md
+CLAUDE.md

@@ -881,8 +881,6 @@ export function DashboardClient() {
       <div className="mx-auto flex min-h-full max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6">
       <section className={isLoaded ? "flex flex-col gap-12" : "grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]"}>
         <div className="flex flex-col gap-6">
-          {/* Drop target was here — moved into the landing hero. */}
-
           {archive ? (
             <div className="flex flex-col gap-6 animate-fade-in-up">
               {view === "surplus" ? (
@@ -1433,15 +1431,8 @@ export function DashboardClient() {
                     </div>
                   ) : null}
 
-                  {/* (The separate "downstream inference scores" panel
-                      was merged into "What a model learned" — each
-                      bullet now carries both the score value and its
-                      definition so the statistic is never disconnected
-                      from its meaning.) */}
-
                   {/* ML flattening step: text → number, shown literally.
-                      Condensed — one intro line, a token trail, a single-
-                      row derivation, and one takeaway. Shown on sub-step 3. */}
+                      Shown on sub-step 3. */}
                   {captureSubStep === 2 && showcase.sentiment && showcase.pick.text ? (
                     <div className="rounded-2xl border border-violet-200 bg-violet-50/60 p-5 dark:border-violet-900/60 dark:bg-violet-950/20">
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -3142,10 +3133,6 @@ export function DashboardClient() {
                   </section>
                 );
               })() : null}
-
-              {/* (Old Step 4 "Your stats" header deleted — its content
-                  is now Step 3 sub-step 3, "Your shape".) */}
-
 
               {/* ========== MITIGATION VIEW ========== */}
               {/* Separate top-level view, selectable from the sticky-nav.
